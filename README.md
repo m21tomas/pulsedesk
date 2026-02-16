@@ -1,3 +1,5 @@
+🚀 [Live Demo](https://pulsedesk-8fts.onrender.com) (Please allow ~50 seconds for the initial wake-up)
+
 # 🚀 PulseDesk: AI-Powered Multilingual Support Triage
 
 **PulseDesk** is a modern backend service designed to solve a common enterprise problem: efficiently triaging customer feedback in a multilingual environment. Using state-of-the-art Large Language Models (LLMs), PulseDesk automatically translates, categorizes, and prioritizes incoming comments in real-time.
