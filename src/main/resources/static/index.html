@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PulseDesk | AI Triage</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background-image: url('https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-attachment: fixed;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        .selected-row {
+            background-color: #f3f4f6 !important;
+            border-left: 4px solid #3b82f6;
+        }
+    </style>
+</head>
+<body class="py-10">
+
+    <div class="container mx-auto max-w-[80%] glass-panel min-h-screen rounded-xl shadow-2xl p-8">
+        
+        <header class="text-center mb-12">
+            <h1 class="text-7xl font-black tracking-tighter text-blue-900 mb-2">PULSE<span class="text-blue-500">DESK</span></h1>
+            <p class="text-gray-500 uppercase tracking-widest font-bold">AI Support Corporation</p>
+        </header>
+
+        <section class="mb-12 max-w-2xl mx-auto">
+            <div class="flex flex-col gap-4 items-center">
+                <textarea id="commentInput" rows="3" class="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-blue-500 outline-none transition" placeholder="Enter customer feedback here..."></textarea>
+                <div class="flex items-center gap-4">
+                    <button onclick="submitComment()" id="submitBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition flex items-center gap-2">
+                        <span>Submit to AI</span>
+                        <i id="loadingIcon" class="fas fa-spinner fa-spin hidden"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <hr class="mb-12 border-gray-200">
+
+        <section class="mb-12">
+            <div class="flex justify-between items-end mb-4">
+                <h2 class="text-2xl font-bold text-gray-800">Recent Comments</h2>
+                <button onclick="deleteSelectedComment()" class="text-red-600 hover:text-red-800 font-semibold text-sm">
+                    <i class="fas fa-trash mr-1"></i> Delete Selected
+                </button>
+            </div>
+            <div class="overflow-x-auto bg-white rounded-lg shadow">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100 border-b">
+                            <th class="p-4 uppercase text-xs font-bold text-gray-600">ID</th>
+                            <th class="p-4 uppercase text-xs font-bold text-gray-600">Content</th>
+                            <th class="p-4 uppercase text-xs font-bold text-gray-600">Created At</th>
+                            <th class="p-4 uppercase text-xs font-bold text-gray-600">Ticket?</th>
+                        </tr>
+                    </thead>
+                    <tbody id="commentsBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section>
+            <div class="flex justify-between items-end mb-4">
+                <h2 class="text-2xl font-bold text-gray-800">Generated Tickets</h2>
+                <button onclick="deleteSelectedTicket()" class="text-red-600 hover:text-red-800 font-semibold text-sm">
+                    <i class="fas fa-trash mr-1"></i> Delete Selected
+                </button>
+            </div>
+            <div class="overflow-x-auto bg-white rounded-lg shadow">
+                <table class="w-full text-left border-collapse">
+					<thead>
+					    <tr class="bg-gray-100 border-b">
+					        <th class="p-4 uppercase text-xs font-bold text-gray-600">Title</th>
+					        <th class="p-4 uppercase text-xs font-bold text-gray-600">Summary</th>
+					        <th class="p-4 uppercase text-xs font-bold text-gray-600">Category</th>
+					        <th class="p-4 uppercase text-xs font-bold text-gray-600">Priority</th>
+					        <th class="p-4 uppercase text-xs font-bold text-gray-600">Comment ID</th>
+					    </tr>
+					</thead>
+                    <tbody id="ticketsBody"></tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        let selectedCommentId = null;
+        let selectedTicketId = null;
+
+        // Fetch everything on load
+        window.onload = () => {
+            refreshData();
+        };
+
+        async function refreshData() {
+            const comments = await fetch('/comments').then(r => r.json());
+            const tickets = await fetch('/tickets').then(r => r.json());
+            
+            renderComments(comments);
+            renderTickets(tickets);
+        }
+
+        function renderComments(data) {
+            const body = document.getElementById('commentsBody');
+            body.innerHTML = data.map(c => `
+                <tr onclick="selectRow(this, 'comment', ${c.id})" class="border-b cursor-pointer hover:bg-gray-50">
+                    <td class="p-4 font-mono text-sm">${c.id}</td>
+                    <td class="p-4 text-sm">${c.content}</td>
+                    <td class="p-4 text-xs text-gray-500">${c.createdAt}</td>
+                    <td class="p-4"><span class="px-2 py-1 rounded text-xs font-bold ${c.convertedToTicket === 'Yes' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}">${c.convertedToTicket}</span></td>
+                </tr>
+            `).join('');
+        }
+
+		function renderTickets(data) {
+		    const body = document.getElementById('ticketsBody');
+		    body.innerHTML = data.map(t => `
+		        <tr onclick="selectRow(this, 'ticket', ${t.id})" class="border-b cursor-pointer hover:bg-gray-50">
+		            <td class="p-4">
+		                <div class="font-bold text-blue-900">${t.title}</div>
+		            </td>
+		            <td class="p-4">
+		                <div class="text-xs text-gray-500">${t.summary}</div>
+		            </td>
+		            <td class="p-4">
+		                <span class="text-xs font-bold text-gray-700 bg-gray-100 px-2 py-1 rounded">${t.category}</span>
+		            </td>
+		            <td class="p-4">
+		                <span class="text-xs font-bold ${t.priority === 'HIGH' ? 'text-red-600 bg-red-50 px-2 py-1 rounded' : 'text-gray-600 bg-gray-50 px-2 py-1 rounded'}">
+		                    ${t.priority}
+		                </span>
+		            </td>
+		            <td class="p-4 text-sm text-gray-500">${t.originalCommentId}</td>
+		        </tr>
+		    `).join('');
+		}
+
+        async function submitComment() {
+            const input = document.getElementById('commentInput');
+            const btn = document.getElementById('submitBtn');
+            const icon = document.getElementById('loadingIcon');
+            
+            if(!input.value) return;
+
+            btn.disabled = true;
+            icon.classList.remove('hidden');
+
+            await fetch('/comments', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({text: input.value})
+            });
+
+            input.value = '';
+            btn.disabled = false;
+            icon.classList.add('hidden');
+            refreshData();
+        }
+
+        function selectRow(el, type, id) {
+            document.querySelectorAll('tr').forEach(r => r.classList.remove('selected-row'));
+            el.classList.add('selected-row');
+            if(type === 'comment') selectedCommentId = id;
+            if(type === 'ticket') selectedTicketId = id;
+        }
+
+        async function deleteSelectedComment() {
+            if(!selectedCommentId) return alert('Select a comment first!');
+            await fetch(`/comments/${selectedCommentId}`, {method: 'DELETE'});
+            refreshData();
+        }
+
+        async function deleteSelectedTicket() {
+            if(!selectedTicketId) return alert('Select a ticket first!');
+            await fetch(`/tickets/${selectedTicketId}`, {method: 'DELETE'});
+            refreshData();
+        }
+    </script>
+</body>
+</html>
