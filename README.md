@@ -47,6 +47,15 @@ Set your token as an environment variable:
 export HF_API_TOKEN=your_token_here
 ```
 3. **Run the application:**
+**Windows:**
+```bash
+mvnw spring-boot:run
+```
+**Windows (Git Bash) / Linux / macOS**
+```bash
+./mvnw spring-boot:run
+```
+or using installed Maven:
 ```bash
 mvn spring-boot:run
 ```
