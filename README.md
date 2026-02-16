@@ -38,7 +38,10 @@ Large Language Models occasionally return "chatty" responses or missing delimite
 ### Installation
 1. **Clone the repository:**
 ```bash
-git clone [https://github.com/your-username/pulsedesk.git](https://github.com/your-username/pulsedesk.git)
+git clone https://github.com/m21tomas/pulsedesk.git
+```
+Navigate to the project directory
+```bash
 cd pulsedesk
 ```
 2. **Set your API Token:**
