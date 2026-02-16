@@ -45,7 +45,7 @@ Navigate to the project directory
 cd pulsedesk
 ```
 2. **Set your API Token:**
-Set your token as an environment variable:
+Set your Hugging Face access token as an environment variable:
 ```bash
 export HF_API_TOKEN=your_token_here
 ```
