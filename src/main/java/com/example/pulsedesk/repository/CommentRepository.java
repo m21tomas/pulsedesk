@@ -10,4 +10,6 @@ import com.example.pulsedesk.model.Comment;
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 	@Query("SELECT c FROM Comment c LEFT JOIN FETCH c.ticket")
     List<Comment> findAllWithTickets();
+
+	Comment findByTicketId(Long id);
 }

@@ -84,7 +84,7 @@ public class HuggingFaceService {
         String rawResponse = restTemplate.postForObject(apiUrl, request, String.class);
 
         JsonNode root = mapper.readTree(rawResponse);
-        String content = root.path("choices").get(0).path("message").path("content").asText();
+        String content = root.path("choices").get(0).path("message").path("content").asString();
 
         String cleanJson = sanitizeContent(content);
         
@@ -96,14 +96,6 @@ public class HuggingFaceService {
         
         // Remove Markdown code blocks if present
         cleaned = cleaned.replaceAll("(?s)```(?:json)?\\n?(.*?)\\n?```", "$1").trim();
-
-        // Ensure root braces exist (Fixes Gemma-style output)
-        if (!cleaned.startsWith("{")) {
-            cleaned = "{" + cleaned;
-        }
-        if (!cleaned.endsWith("}")) {
-            cleaned = cleaned + "}";
-        }
 
         // Find the actual JSON boundaries in case of extra text
         int start = cleaned.indexOf("{");

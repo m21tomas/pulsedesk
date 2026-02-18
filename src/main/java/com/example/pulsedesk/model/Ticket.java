@@ -8,8 +8,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
 
 @Entity
 public class Ticket {
@@ -27,21 +25,16 @@ public class Ticket {
 
     private String summary;
 
-    @OneToOne
-    @JoinColumn(name = "comment_id", nullable = false)
-    private Comment comment;
-
     private LocalDateTime createdAt;
 
 	public Ticket() {}
 
-	public Ticket(String title, TicketCategory category, TicketPriority priority, String summary, Comment comment,
+	public Ticket(String title, TicketCategory category, TicketPriority priority, String summary,
 			LocalDateTime createdAt) {
 		this.title = title;
 		this.category = category;
 		this.priority = priority;
 		this.summary = summary;
-		this.comment = comment;
 		this.createdAt = createdAt;
 	}
 
@@ -83,14 +76,6 @@ public class Ticket {
 
 	public void setSummary(String summary) {
 		this.summary = summary;
-	}
-
-	public Comment getComment() {
-		return comment;
-	}
-
-	public void setComment(Comment comment) {
-		this.comment = comment;
 	}
 
 	public LocalDateTime getCreatedAt() {

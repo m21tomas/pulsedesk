@@ -13,19 +13,16 @@ public class TicketResponse {
 	
 	private String createdAt;
 	
-	private Long originalCommentId;
-	
 	public TicketResponse() {}
 
 	public TicketResponse(Long id, String title, String category, String priority, String summary, 
-			              String createdAt, Long originalCommentId) {
+			              String createdAt) {
 		this.id = id;
 		this.title = title;
 		this.category = category;
 		this.priority = priority;
 		this.summary = summary;
 		this.createdAt = createdAt;
-		this.originalCommentId = originalCommentId;
 	}
 
 	public Long getId() {
@@ -74,13 +71,5 @@ public class TicketResponse {
 
 	public void setCreatedAt(String createdAt) {
 		this.createdAt = createdAt;
-	}
-
-	public Long getOriginalCommentId() {
-		return originalCommentId;
-	}
-
-	public void setOriginalCommentId(Long originalCommentId) {
-		this.originalCommentId = originalCommentId;
 	}
 }

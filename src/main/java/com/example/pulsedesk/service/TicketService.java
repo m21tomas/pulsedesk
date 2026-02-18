@@ -10,6 +10,7 @@ import com.example.pulsedesk.exception.ResourceNotFoundException;
 import com.example.pulsedesk.model.Comment;
 import com.example.pulsedesk.model.Ticket;
 import com.example.pulsedesk.model.TicketPriority;
+import com.example.pulsedesk.repository.CommentRepository;
 import com.example.pulsedesk.repository.TicketRepository;
 
 import jakarta.transaction.Transactional;
@@ -17,10 +18,13 @@ import jakarta.transaction.Transactional;
 @Service
 public class TicketService {
 	private final TicketRepository ticketRepository;
+	private final CommentRepository commentRepository;
+	
 	private static final DateTimeFormatter ISO_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
-    public TicketService(TicketRepository ticketRepository) {
+    public TicketService(TicketRepository ticketRepository, CommentRepository commentRepository) {
         this.ticketRepository = ticketRepository;
+		this.commentRepository = commentRepository;
     }
 
     public List<TicketResponse> getAllTickets() {
@@ -46,13 +50,16 @@ public class TicketService {
     
     @Transactional
     public void deleteTicket(Long id) {
-        Ticket ticket = ticketRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Ticket not found"));
-        Comment comment = ticket.getComment();
-        if (comment != null) {
-            comment.setConvertedToTicket(false);
+        Comment comment = commentRepository.findByTicketId(id);
+        
+        if (comment == null) {
+            throw new ResourceNotFoundException("No comment found linked to ticket ID: " + id);
         }
-        ticketRepository.delete(ticket);
+
+        comment.setTicket(null);
+        comment.setConvertedToTicket(false);
+
+        commentRepository.save(comment);
     }
     
     @Transactional
@@ -67,8 +74,7 @@ public class TicketService {
             ticket.getCategory().name(),
             ticket.getPriority().name(),
             ticket.getSummary(),
-            ticket.getCreatedAt().format(ISO_FORMATTER),
-            ticket.getComment().getId()
+            ticket.getCreatedAt().format(ISO_FORMATTER)
         );
     }
 }

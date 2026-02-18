@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,6 +21,7 @@ import com.example.pulsedesk.model.Comment;
 import com.example.pulsedesk.model.Ticket;
 import com.example.pulsedesk.model.TicketCategory;
 import com.example.pulsedesk.model.TicketPriority;
+import com.example.pulsedesk.repository.CommentRepository;
 import com.example.pulsedesk.repository.TicketRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,6 +30,9 @@ public class TicketServiceTest {
 	@Mock
     private TicketRepository ticketRepository;
 	
+	@Mock
+    private CommentRepository commentRepository;
+	
 	@InjectMocks
 	private TicketService ticketService;
 	
@@ -37,19 +40,18 @@ public class TicketServiceTest {
 	void deleteTicketSetsCommentFlagToFalse() {
 	    Long ticketId = 1L;
 	    Comment comment = new Comment();
-	    comment.setConvertedToTicket(true);
-	    comment.setCreatedAt(LocalDateTime.now());
-
 	    Ticket ticket = new Ticket();
 	    ticket.setId(ticketId);
-	    ticket.setComment(comment);
+	    comment.setConvertedToTicket(true);
+	    comment.setCreatedAt(LocalDateTime.now());
+	    comment.setTicket(ticket);
 
-	    when(ticketRepository.findById(ticketId)).thenReturn(Optional.of(ticket));
+	    when(commentRepository.findByTicketId(ticketId)).thenReturn(comment);
 
 	    ticketService.deleteTicket(ticketId);
 
 	    assertFalse(comment.isConvertedToTicket()); // The most important check!
-	    verify(ticketRepository, times(1)).delete(ticket);
+	    verify(commentRepository, times(1)).save(comment);
 	}
 	
 	@Test
@@ -59,7 +61,6 @@ public class TicketServiceTest {
 	    ticket.setPriority(TicketPriority.HIGH);
 	    ticket.setCategory(TicketCategory.BUG);
 	    ticket.setCreatedAt(LocalDateTime.now());
-	    ticket.setComment(new Comment()); 
 
 	    when(ticketRepository.findByPriority(TicketPriority.HIGH))
 	            .thenReturn(List.of(ticket));

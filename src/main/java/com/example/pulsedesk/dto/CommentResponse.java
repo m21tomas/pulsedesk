@@ -9,14 +9,17 @@ public class CommentResponse {
 	private String createdAt;
 	
 	private String convertedToTicket;
+	
+	private String ticketId;
 
 	public CommentResponse() {}
 
-	public CommentResponse(Long id, String content, String createdAt, String convertedToTicket) {
+	public CommentResponse(Long id, String content, String createdAt, String convertedToTicket, String ticketId) {
 		this.id = id;
 		this.content = content;
 		this.createdAt = createdAt;
 		this.convertedToTicket = convertedToTicket;
+		this.ticketId = ticketId;
 	}
 
 	public Long getId() {
@@ -49,5 +52,13 @@ public class CommentResponse {
 
 	public void setConvertedToTicket(String convertedToTicket) {
 		this.convertedToTicket = convertedToTicket;
+	}
+
+	public String getTicketId() {
+		return ticketId;
+	}
+
+	public void setTicketId(String ticketId) {
+		this.ticketId = ticketId;
 	}
 }

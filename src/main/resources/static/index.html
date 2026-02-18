@@ -56,10 +56,11 @@
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-gray-100 border-b">
-                            <th class="p-4 uppercase text-xs font-bold text-gray-600">ID</th>
+							<th class="p-4 uppercase text-xs font-bold text-gray-600">Comment ID</th>
                             <th class="p-4 uppercase text-xs font-bold text-gray-600">Content</th>
                             <th class="p-4 uppercase text-xs font-bold text-gray-600">Created At</th>
                             <th class="p-4 uppercase text-xs font-bold text-gray-600">Ticket?</th>
+							<th class="p-4 uppercase text-xs font-bold text-gray-600">Ticket ID</th>
                         </tr>
                     </thead>
                     <tbody id="commentsBody"></tbody>
@@ -78,11 +79,11 @@
                 <table class="w-full text-left border-collapse">
 					<thead>
 					    <tr class="bg-gray-100 border-b">
+							<th class="p-4 uppercase text-xs font-bold text-gray-600">Ticket ID</th>
 					        <th class="p-4 uppercase text-xs font-bold text-gray-600">Title</th>
 					        <th class="p-4 uppercase text-xs font-bold text-gray-600">Summary</th>
 					        <th class="p-4 uppercase text-xs font-bold text-gray-600">Category</th>
 					        <th class="p-4 uppercase text-xs font-bold text-gray-600">Priority</th>
-					        <th class="p-4 uppercase text-xs font-bold text-gray-600">Comment ID</th>
 					    </tr>
 					</thead>
                     <tbody id="ticketsBody"></tbody>
@@ -112,10 +113,11 @@
             const body = document.getElementById('commentsBody');
             body.innerHTML = data.map(c => `
                 <tr onclick="selectRow(this, 'comment', ${c.id})" class="border-b cursor-pointer hover:bg-gray-50">
-                    <td class="p-4 font-mono text-sm">${c.id}</td>
+					<td class="p-4 text-sm text-gray-500">${c.id}</td>
                     <td class="p-4 text-sm">${c.content}</td>
                     <td class="p-4 text-xs text-gray-500">${c.createdAt}</td>
                     <td class="p-4"><span class="px-2 py-1 rounded text-xs font-bold ${c.convertedToTicket === 'Yes' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}">${c.convertedToTicket}</span></td>
+					<td class="p-4"><span class="px-2 py-1 rounded text-xs font-bold ${c.ticketId !== 'No' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}">${c.ticketId}</span></td>
                 </tr>
             `).join('');
         }
@@ -124,6 +126,7 @@
 		    const body = document.getElementById('ticketsBody');
 		    body.innerHTML = data.map(t => `
 		        <tr onclick="selectRow(this, 'ticket', ${t.id})" class="border-b cursor-pointer hover:bg-gray-50">
+					<td class="p-4 text-sm text-gray-500">${t.id}</td>
 		            <td class="p-4">
 		                <div class="font-bold text-blue-900">${t.title}</div>
 		            </td>
@@ -138,7 +141,6 @@
 		                    ${t.priority}
 		                </span>
 		            </td>
-		            <td class="p-4 text-sm text-gray-500">${t.originalCommentId}</td>
 		        </tr>
 		    `).join('');
 		}

@@ -8,6 +8,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 
 @Entity
@@ -23,7 +24,8 @@ public class Comment {
 	
 	private boolean convertedToTicket;
 	
-	@OneToOne(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "ticket_id", referencedColumnName = "id")
 	private Ticket ticket;
 	
 	public Comment() {}

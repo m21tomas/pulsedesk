@@ -15,21 +15,17 @@ import com.example.pulsedesk.model.Ticket;
 import com.example.pulsedesk.model.TicketCategory;
 import com.example.pulsedesk.model.TicketPriority;
 import com.example.pulsedesk.repository.CommentRepository;
-import com.example.pulsedesk.repository.TicketRepository;
 
 @Service
 public class CommentService {
 	private final CommentRepository commentRepository;
-    private final TicketRepository ticketRepository;
     private final HuggingFaceService huggingFaceService;
     
     private static final DateTimeFormatter ISO_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
     public CommentService(CommentRepository commentRepository,
-                          TicketRepository ticketRepository,
                           HuggingFaceService huggingFaceService) {
         this.commentRepository = commentRepository;
-        this.ticketRepository = ticketRepository;
         this.huggingFaceService = huggingFaceService;
     }
     
@@ -39,8 +35,6 @@ public class CommentService {
         comment.setContent(text);
         comment.setCreatedAt(LocalDateTime.now());
         comment.setConvertedToTicket(false);
-        
-        comment = commentRepository.save(comment);
 
         AiTriageResponse aiResponse = huggingFaceService.analyzeComment(text);
 
@@ -52,13 +46,10 @@ public class CommentService {
             ticket.setPriority(TicketPriority.fromString(aiResponse.getPriority()));
             ticket.setSummary(aiResponse.getSummary());
             ticket.setCreatedAt(LocalDateTime.now());
-            ticket.setComment(comment);
             comment.setTicket(ticket);
-
-            ticketRepository.save(ticket);
-            
             comment.setConvertedToTicket(true);
         }
+        comment = commentRepository.save(comment);
         return mapToResponse(comment);
     }
     
@@ -80,7 +71,8 @@ public class CommentService {
             comment.getId(),
             comment.getContent(),
             comment.getCreatedAt().format(ISO_FORMATTER),
-            comment.isConvertedToTicket() ? "Yes" : "No"
+            comment.isConvertedToTicket() ? "Yes" : "No",
+            comment.getTicket() != null ? comment.getTicket().getId().toString() : "No"
         );
     }
     
